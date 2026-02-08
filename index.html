@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>OMNI ARCHIVE · Dragon Ball Multiverse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FUENTES -->
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@300;400;700;900&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+/* ======================================================
+   VARIABLES GLOBALES
+====================================================== */
+:root{
+  --bg:#050508;
+  --glass:rgba(15,15,30,.7);
+  --border:rgba(255,255,255,.1);
+  --primary:#ffd166;
+  --accent:#00d2d3;
+  --danger:#ff4757;
+  --font-title:'Russo One',sans-serif;
+  --font-main:'Inter',sans-serif;
+  --font-tech:'Fira Code',monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:var(--bg);
+  color:#fff;
+  font-family:var(--font-main);
+  overflow-x:hidden;
+}
+
+/* ======================================================
+   FONDO TECNOLÓGICO
+====================================================== */
+.grid-bg{
+  position:fixed;inset:0;z-index:-2;
+  background:
+    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+.glow{
+  position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(circle at 50% -20%,rgba(255,209,102,.15),transparent 70%);
+}
+
+/* ======================================================
+   HERO
+====================================================== */
+.hero{
+  min-height:80vh;
+  display:flex;
+  align-items:flex-end;
+  padding:clamp(1.5rem,5vw,4rem);
+  position:relative;
+}
+.hero video,.hero img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  opacity:.45;
+  mask-image:linear-gradient(to bottom,black 60%,transparent);
+}
+.hero h1{
+  font-family:var(--font-title);
+  font-size:clamp(3rem,12vw,7rem);
+  line-height:.9;
+  text-transform:uppercase;
+  background:linear-gradient(#fff,#888);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+.hero p{max-width:600px;opacity:.85}
+
+/* ======================================================
+   BUSCADOR + FILTRO
+====================================================== */
+.controls{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:1rem;
+  padding:1.5rem clamp(1rem,5vw,4rem);
+}
+input,select{
+  background:var(--glass);
+  border:1px solid var(--border);
+  padding:1rem;
+  border-radius:12px;
+  color:#fff;
+}
+input:focus{outline:none;border-color:var(--primary)}
+
+/* ======================================================
+   SCROLL HORIZONTAL NETFLIX
+====================================================== */
+.label{
+  padding:1rem clamp(1rem,5vw,4rem);
+  color:var(--primary);
+  font-weight:800;
+  letter-spacing:2px;
+  font-size:.75rem;
+}
+.scroll-x{
+  display:flex;
+  gap:1.2rem;
+  overflow-x:auto;
+  padding:0 clamp(1rem,5vw,4rem) 2rem;
+}
+.scroll-x::-webkit-scrollbar{display:none}
+
+.card{
+  min-width:260px;
+  height:150px;
+  border-radius:14px;
+  overflow:hidden;
+  position:relative;
+  border:1px solid var(--border);
+  transition:.4s;
+}
+.card:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 25px rgba(255,209,102,.3);
+}
+.card img{
+  width:100%;height:100%;
+  object-fit:cover;opacity:.7;
+}
+.card span{
+  position:absolute;bottom:0;
+  width:100%;
+  padding:.6rem;
+  background:linear-gradient(transparent,rgba(0,0,0,.9));
+  font-size:.8rem;
+}
+
+/* ======================================================
+   PERSONAJES CIRCULARES
+====================================================== */
+.circle{
+  text-align:center;
+  cursor:pointer;
+}
+.circle img{
+  width:90px;height:90px;
+  border-radius:50%;
+  border:2px solid var(--border);
+  transition:.3s;
+}
+.circle:hover img{
+  border-color:var(--primary);
+  box-shadow:0 0 15px var(--primary);
+}
+.circle span{display:block;font-size:.7rem;margin-top:.4rem}
+
+/* ======================================================
+   ÁRBOL EXPANDIBLE
+====================================================== */
+.tree{
+  margin:2rem clamp(1rem,5vw,4rem);
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:2rem;
+}
+.node{
+  border-left:2px solid var(--border);
+  padding-left:1rem;
+  margin-bottom:1rem;
+}
+.node h4{
+  cursor:pointer;
+  font-family:var(--font-tech);
+}
+.node.open p{max-height:300px}
+.node p{
+  max-height:0;
+  overflow:hidden;
+  transition:.4s;
+  opacity:.85;
+}
+.node.highlight{
+  border-color:var(--primary);
+  background:rgba(255,209,102,.05);
+}
+
+/* ======================================================
+   CRONISTA ANTIGUO
+====================================================== */
+#cronista{
+  position:fixed;
+  bottom:20px;left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.9);
+  border:1px solid var(--primary);
+  border-radius:16px;
+  padding:1.2rem;
+  max-width:600px;
+  width:90%;
+  font-family:var(--font-tech);
+  color:var(--primary);
+  opacity:0;
+  pointer-events:none;
+  transition:.4s;
+}
+#cronista.active{opacity:1}
+
+/* ======================================================
+   CORRUPCIÓN
+====================================================== */
+body.corrupt{
+  animation:glitch .25s infinite;
+  filter:hue-rotate(90deg) contrast(1.5);
+}
+@keyframes glitch{
+  0%{transform:translate(0)}
+  33%{transform:translate(-4px,2px)}
+  66%{transform:translate(4px,-2px)}
+}
+
+/* ======================================================
+   MOBILE
+====================================================== */
+@media(max-width:768px){
+  .controls{grid-template-columns:1fr}
+  .hero{min-height:60vh}
+}
+</style>
+</head>
+
+<body onkeydown="if(event.key.toLowerCase()==='s')exportFile()">
+
+<div class="grid-bg"></div>
+<div class="glow"></div>
+
+<section class="hero">
+  <!-- Placeholder video -->
+  <video autoplay muted loop playsinline>
+    <source src="" type="video/mp4">
+  </video>
+  <div>
+    <h1 id="heroTitle">OMNI ARCHIVE</h1>
+    <p id="heroDesc">El cronista observa todas las líneas temporales…</p>
+  </div>
+</section>
+
+<section class="controls">
+  <input id="search" placeholder="Buscar personaje, saga o universo…" oninput="searchTree()">
+  <select onchange="changeUniverse(this.value)">
+    <option value="ALL">🌌 Multiverso</option>
+    <option value="DB">🐉 Dragon Ball</option>
+    <option value="DBZ">⚡ Dragon Ball Z</option>
+    <option value="DBS">🔥 Dragon Ball Super</option>
+    <option value="GT">⚙️ Dragon Ball GT</option>
+  </select>
+</section>
+
+<div class="label">ENTIDADES</div>
+<div class="scroll-x" id="characters"></div>
+
+<div class="label">CONTINUAR VIENDO</div>
+<div class="scroll-x" id="media"></div>
+
+<div class="label">ÁRBOL DEL MULTIVERSO</div>
+<div class="tree" id="tree"></div>
+
+<div id="cronista"></div>
+
+<script>
+/* ======================================================
+   BASE DE DATOS
+====================================================== */
+const DB=[
+ {name:"Goku",uni:"DBS",desc:"El mortal que rozó la divinidad."},
+ {name:"Vegeta",uni:"DBS",desc:"Orgullo convertido en poder destructivo."},
+ {name:"Gohan",uni:"DBZ",desc:"Potencial oculto más allá de los dioses."},
+ {name:"Trunks GT",uni:"GT",desc:"El eco de una línea temporal olvidada."}
+];
+
+let current="ALL";
+
+/* ======================================================
+   INIT
+====================================================== */
+renderAll(DB);
+speak("Yo soy el Cronista. Guardián de todas las eras.");
+
+/* ======================================================
+   RENDER
+====================================================== */
+function renderAll(data){
+  characters.innerHTML="";
+  media.innerHTML="";
+  tree.innerHTML="";
+  data.forEach(d=>{
+    characters.innerHTML+=`
+      <div class="circle" onclick="focus('${d.name}','${d.desc}')">
+        <img src="https://placehold.co/200x200?text=${d.name}">
+        <span>${d.name}</span>
+      </div>`;
+    media.innerHTML+=`
+      <div class="card" onclick="focus('${d.name}','${d.desc}')">
+        <img src="https://placehold.co/600x400?text=${d.uni}">
+        <span>${d.name} · ${d.uni}</span>
+      </div>`;
+    tree.innerHTML+=`
+      <div class="node" data-search="${d.name.toLowerCase()} ${d.uni.toLowerCase()}">
+        <h4 onclick="this.parentElement.classList.toggle('open')">📁 ${d.name}</h4>
+        <p>${d.desc}</p>
+      </div>`;
+  });
+}
+
+/* ======================================================
+   BUSCADOR
+====================================================== */
+function searchTree(){
+  const q=search.value.toLowerCase();
+  document.querySelectorAll(".node").forEach(n=>{
+    if(n.dataset.search.includes(q)){
+      n.style.display="";
+      n.classList.toggle("highlight",q.length>2);
+    }else n.style.display="none";
+  });
+}
+
+/* ======================================================
+   UNIVERSOS + CORRUPCIÓN
+====================================================== */
+function changeUniverse(u){
+  if(current!=="ALL" && u!==current) corrupt();
+  current=u;
+  renderAll(u==="ALL"?DB:DB.filter(d=>d.uni===u));
+  speak("Línea temporal ajustada: "+u);
+}
+
+/* ======================================================
+   CRONISTA
+====================================================== */
+function speak(text){
+  cronista.classList.add("active");
+  cronista.textContent="";
+  let i=0;
+  const t=setInterval(()=>{
+    cronista.textContent+=text[i++];
+    if(i>=text.length){clearInterval(t);setTimeout(()=>cronista.classList.remove("active"),4000);}
+  },30);
+}
+
+/* ======================================================
+   CORRUPCIÓN
+====================================================== */
+function corrupt(){
+  document.body.classList.add("corrupt");
+  speak("⚠️ Las realidades se están mezclando…");
+  setTimeout(()=>document.body.classList.remove("corrupt"),2000);
+}
+document.addEventListener("dblclick",corrupt);
+
+/* ======================================================
+   EXPORTACIÓN
+====================================================== */
+function exportFile(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="OMNI_ARCHIVE_EXPORT.html";
+  a.click();
+  speak("Archivo clonado. El conocimiento perdura.");
+}
+</script>
+</body>
+</html>
